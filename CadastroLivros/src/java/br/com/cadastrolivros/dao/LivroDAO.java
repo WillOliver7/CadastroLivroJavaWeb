@@ -20,12 +20,43 @@ public class LivroDAO implements GenericDAO {
 
     @Override
     public Boolean cadastrar(Object objeto) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Livro oLivro = (Livro) objeto;
+        Boolean retorno=false;
+        if (oLivro.getId()== 0) {
+            retorno = this.inserir(oLivro);
+        }else{
+            retorno = this.alterar(oLivro);
+        }
+        return retorno;
     }
 
     @Override
     public Boolean inserir(Object objeto) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Livro oLivro = (Livro) objeto;
+        PreparedStatement stmt = null;
+        String sql = "insert into livro (nomelivro,isbn, autor, datapublicacao, valorlivro) "
+                + "values (?,?,?,?,?)";  
+        try {
+            stmt = conexao.prepareStatement(sql);
+            stmt.setString(1, oLivro.getNomelivro());        
+            stmt.setString(2, oLivro.getIsbn());
+            stmt.setString(3, oLivro.getAutor());
+            stmt.setDate(4, new java.sql.Date(oLivro.getDatapublicacao().getTime()));
+            stmt.setDouble(5, oLivro.getValorlivro());
+            stmt.execute();
+            conexao.commit();
+            return true;
+        } catch (Exception ex) {
+            try {
+                System.out.println("Problemas ao cadastrar a Livro! Erro: "+ex.getMessage());
+                ex.printStackTrace();
+                conexao.rollback();
+            } catch (SQLException e) {
+                System.out.println("Erro:"+e.getMessage());
+                e.printStackTrace();
+            }
+            return false;
+        } 
     }
 
     @Override
