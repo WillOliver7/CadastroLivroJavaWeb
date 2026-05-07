@@ -15,8 +15,10 @@ import java.util.Date;
 public class LivroCadastrar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=iso-8859-1");
+        int id;
         try{
-            
+            id = 0;
+            if (request.getParameter("id") != "") id = Integer.parseInt(request.getParameter("id"));
             LivroDAO dao = new LivroDAO();
             String nomelivro = request.getParameter("nomelivro");
             String isbn = request.getParameter("isbn");
@@ -28,6 +30,7 @@ public class LivroCadastrar extends HttpServlet {
             valorlivroStr = valorlivroStr.replace("R$", "")     // remove "R$"
                            .replace(".", "")       // remove ponto de milhar
                            .replace(",", ".")      // troca vírgula decimal por ponto
+                            .replace("\u00A0", "")
                            .trim();                // remove espaços extras
 
             double valorlivro = Double.parseDouble(valorlivroStr);
@@ -36,9 +39,14 @@ public class LivroCadastrar extends HttpServlet {
                        isbn.isBlank() || autor.isEmpty()) {
                 //verifica inconsistencias em outros atributos do cadastro
                 response.getWriter().write("5");
+            } else if (dao.isbnExiste(isbn) && id == 0){
+                //verifica se cpf já esta cadastrado
+                response.getWriter().write("4");
             } else {
                 //passou nas validacoes - grava dados
                 Livro oLivro = new Livro();
+                if(id != 0) oLivro = (Livro) dao.carregar(id);
+                
                 oLivro.setNomelivro(nomelivro);
                 oLivro.setIsbn(isbn);
                 oLivro.setAutor(autor);

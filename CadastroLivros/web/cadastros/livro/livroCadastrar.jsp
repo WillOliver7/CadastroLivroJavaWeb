@@ -183,7 +183,7 @@
                     Swal.fire({
                         position: 'center',
                         icon: 'error',
-                        title: 'CPF já cadastrado!',
+                        title: 'ISBN já cadastrado!',
                         showConfirmButton: true,
                         timer: 5000
                     }).then(function () {
